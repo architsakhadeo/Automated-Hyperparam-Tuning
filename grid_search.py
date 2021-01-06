@@ -13,7 +13,7 @@ from time import time
 # Takes 5880 sec = 98 min to run true online TD lambda=0.4
 # Opt for the settings with lower run times like normal vs true online TD lambda
 # Compare performances of normal vs true online TD lambda for fun
-# Just run normal TD lambda with best performance for 1, 25, 50, 75, 100 runs sequentially, without any other setting in parallel
+# Just run normal TD lambda with best performance for 100 runs sequentially, without any other setting in parallel - time = 1500 sec = 25 min
 # Post on hyperparams channel and ask for how to tackle cross entropy optimization
 # Get Parameter Study on stepsize vs lambda vs performance 
 # Measure the wall clock time
@@ -22,13 +22,18 @@ truevalue_weights = [-24, -16, -8, 0]
 gamma = 1.0
 length_observation = 4
 num_episodes = 50000
-num_runs = 100
+num_runs = 1
 start = time()
+lmbda = 0.4
+stepsize = 0.00025
+alpha = 0.002
+beta1 = 0.9
+beta2 = 0.999
 
 for run in range(num_runs):
     print(run)
     environment = boyans_chain()
-    agent = TD_lambda(gamma, length_observation)
+    agent = TD_lambda(gamma, lmbda, alpha, beta1, beta2, length_observation)
     endofrun = False
     for episode in range(num_episodes):
         seed = run * num_episodes + episode
@@ -43,6 +48,9 @@ for run in range(num_runs):
             if episode == num_episodes - 1:
                 endofrun = True
             observation, reward, endofepisode, fullstate, mapping = environment.step(action)
-            action = agent.step(observation, reward, endofepisode, endofrun, run, truevalue_weights, mapping)
+            action, lossendofepisode = agent.step(observation, reward, endofepisode, endofrun, run, truevalue_weights, mapping)
 end = time()
-print(end-start)
+datapath = 'Data/boyans_chain/' + 'lambda=' + str(lmbda) + '_' + 'stepsize=' + str(stepsize) + '/time'
+file = open(datapath, 'w+')
+file.write(str(end-start))
+file.close()

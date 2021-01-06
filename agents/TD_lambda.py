@@ -4,14 +4,20 @@ import os
 
 # no tilecoding, simply linear value function
 class TD_lambda():
-    def __init__(self, gamma, length_observation):
+    def __init__(self, gamma, lmbda, a0, n0, length_observation):
         self.last_action = None
-        self.stepsize = 0.00025
-        self.alpha = 0.01
-        self.lmbda = 0.4
+        #self.stepsize = stepsize
+        self.a0 = a0
+        self.n0 = n0
+        #self.alpha = alpha
+        #self.beta1 = beta1
+        #self.beta2 = beta2
+        self.lmbda = lmbda
         self.length_observation = length_observation
         self.weights = np.zeros(self.length_observation)
-        self.n0 = 1000
+        self.m = np.zeros(self.length_observation)
+        self.v = np.zeros(self.length_observation)
+        self.e = 10**-8
         self.timesteps = 0
         self.episodes = 0
         self.gamma = gamma
@@ -27,7 +33,7 @@ class TD_lambda():
         self.last_observation = observation
         self.last_action = 0
         self.z = np.zeros(self.length_observation)
-        
+        self.rmsveendofepisode = 'None'
     
         return self.last_action
 
@@ -36,7 +42,8 @@ class TD_lambda():
         mapping = np.array(mapping)
 
         # Adaptive stepsize
-        #self.stepsize = self.alpha * (self.n0 + 1) / (self.n0 + self.episodes)
+        self.stepsize = self.a0 * (self.n0 + 1) / (self.n0 + self.episodes)
+
 
         observation = np.array(observation)
 
@@ -56,10 +63,19 @@ class TD_lambda():
         #    delta = reward + (self.gamma * Vprime) - V
         #else:
         #    delta = reward - V
-        
 
+        # SGD
         self.weights += self.stepsize * delta * self.z
         
+        #Adam
+        '''
+        g = - delta * self.z
+        self.m = self.beta1*self.m + (1-self.beta1)*g
+        self.v = self.beta1*self.v + (1-self.beta1)*g*g
+        mhat = self.m / (1 - self.beta1**self.timesteps)
+        vhat = self.v / (1 - self.beta2**self.timesteps)
+        self.weights -= self.alpha * mhat / (vhat**0.5 + self.e)
+        '''
 
 
         # True online TD lambda
@@ -89,16 +105,20 @@ class TD_lambda():
         # append only end of episode errors on all states
         if endofepisode == True:
             self.losslist.append(rmsve)
+            self.rmsveendofepisode = rmsve
 
+        # Don't store data for cross entropy method
+        '''
         if endofrun == True and endofepisode == True:
-            dirpath = 'Data/boyans_chain/' + 'trueonlineTDlambda=' + str(self.lmbda) + '_' + 'stepsize=' + str(self.stepsize) + '/'
+            dirpath = 'Data/boyans_chain/' + 'lambda=' + str(self.lmbda) + '_' + 'stepsize=' + str(self.stepsize) + '/'
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
             pickle.dump(self.losslist, open(dirpath + 'run'+str(run)+'_rmsve','wb'))
             print(dirpath, self.episodes)
+        '''
 
         self.last_observation = observation
         self.last_action = 0
 
-        return self.last_action
+        return self.last_action, self.rmsveendofepisode
     
