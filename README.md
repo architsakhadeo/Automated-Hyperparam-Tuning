@@ -1,4 +1,4 @@
-# hyperparams_boyanschain
+# Automated-Hyperparam-Tuning
 
 This is the code for automated hyperparameter tuning for the following experiments:
 1) Prediction task - Boyan's chain environment using TD lambda agent
