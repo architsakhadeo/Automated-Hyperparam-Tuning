@@ -4,7 +4,7 @@ Instructions to run:
 
 > python _filename_.py
   
-  _filename_ = CEMcontinuous or CEMdiscrete or gridsearch
+> where _filename_ = CEMcontinuous or CEMdiscrete or gridsearch
 
 This is the code for automated hyperparameter tuning for the following experiments:
 1) Prediction task - Boyan's chain environment using TD lambda agent
