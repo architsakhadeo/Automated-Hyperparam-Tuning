@@ -1,10 +1,11 @@
 # Automated-Hyperparam-Tuning
 
-Instructions to run:
+## Instructions to run:
 
-> python _filename_.py
-  
-> where _filename_ = CEMcontinuous or CEMdiscrete or grid_search
+`python <filename>.py`<br>
+`where <filename> = CEMcontinuous or CEMdiscrete or grid_search`
+
+## Description
 
 This is the code for automated hyperparameter tuning for the following experiments:
 1) Prediction task - Boyan's chain environment using TD lambda agent
